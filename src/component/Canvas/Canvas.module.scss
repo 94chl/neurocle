@@ -1,0 +1,11 @@
+.container {
+  height: 100vh;
+  width: 80vw;
+  border: 1px solid #000;
+  box-sizing: border-box;
+  cursor: crosshair;
+
+  .stage {
+    background: orange;
+  }
+}

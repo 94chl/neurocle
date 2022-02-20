@@ -12,7 +12,6 @@ ines (19 sloc)  316 Bytes
 
 # production
 /build
-/dist
 
 # misc
 .DS_Store

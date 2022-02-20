@@ -1,22 +1,33 @@
 const CracoAlias = require("craco-alias");
+const { whenProd } = require("@craco/craco");
+const path = require("path");
 
-module.exports = {
-  plugins: [
-    {
-      plugin: CracoAlias,
-      options: {
-        source: "jsconfig",
-        jsConfigPath: "jsconfig.paths.json",
+module.exports = (arg) => {
+  const { env } = arg;
+  const isDev = env === "development";
+  return {
+    webpack: {
+      configure: (webpackConfig) => {
+        return whenProd(() => {
+          const output = {
+            ...webpackConfig.output,
+            path: path.resolve(__dirname, "dist"),
+            publicPath: isDev ? "/" : "./",
+            clean: true,
+          };
+
+          return { ...webpackConfig, output };
+        }, webpackConfig);
       },
     },
-  ],
-  // style: {
-  //   sass: {
-  //     loaderOptions: {
-  //       additionalData: `
-  //         @import "src/styles/variables.scss";
-  //       `,
-  //     },
-  //   },
-  // },
+    plugins: [
+      {
+        plugin: CracoAlias,
+        options: {
+          source: "jsconfig",
+          jsConfigPath: "jsconfig.paths.json",
+        },
+      },
+    ],
+  };
 };

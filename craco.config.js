@@ -13,7 +13,6 @@ module.exports = (arg) => {
             ...webpackConfig.output,
             path: path.resolve(__dirname, "dist"),
             publicPath: isDev ? "/" : "./",
-            clean: true,
           };
 
           return { ...webpackConfig, output };

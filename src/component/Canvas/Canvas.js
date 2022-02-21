@@ -10,6 +10,8 @@ import { useLocalStorage } from "@/hook";
 
 const { container, stage } = styles;
 
+const layersHistoryLimit = 3;
+
 const Canvas = () => {
   const [canvasContainer, setCanvasContainer] = useState({
     width: 0,
@@ -81,6 +83,7 @@ const Canvas = () => {
     fillColor,
   });
 
+  const [isDrawing, setIsDrawing] = useState(false);
   const [isStitching, setIsStitching] = useState(false);
 
   useEffect(() => {
@@ -91,6 +94,7 @@ const Canvas = () => {
 
   const onSetStartPoint = (e) => {
     setShapePoints([...shapePoints, e.pageX, e.pageY]);
+    setIsDrawing(true);
   };
 
   const onAdjustShape = (e) => {
@@ -136,6 +140,7 @@ const Canvas = () => {
       fillColor,
     });
     setShapePoints([]);
+    setIsDrawing(false);
   };
 
   const finishAdjustShape = (isReset) => {
@@ -145,9 +150,13 @@ const Canvas = () => {
     }
 
     const newShapes = [...shapes];
-    const newLayersHistory = layersHistory.filter(
-      (_, index) => index <= layersNow
-    );
+
+    const newLayersHistory =
+      layersNow <= layersHistoryLimit
+        ? layersHistory.filter((_, index) => index <= layersNow)
+        : layersHistory.filter(
+            (_, index) => index > 0 && index < layersHistoryLimit
+          );
 
     if (isReset && isStitching) {
       const newShape = {
@@ -178,7 +187,7 @@ const Canvas = () => {
       onMouseDown={(e) => !isStitching && onSetStartPoint(e)}
       onMouseUp={() => !isStitching && finishAdjustShape(false)}
       onClick={(e) => isStitching && onSetStartPoint(e)}
-      onMouseMove={(e) => shapePoints.length > 1 && onAdjustShape(e)}
+      onMouseMove={(e) => isDrawing && onAdjustShape(e)}
       onDoubleClick={() => isStitching && finishAdjustShape(false)}
       onKeyDown={(e) => e.key === "Escape" && finishAdjustShape(true)}
       tabIndex="0"

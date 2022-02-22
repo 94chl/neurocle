@@ -6,12 +6,14 @@
   padding: 8px;
   cursor: pointer;
 
-  &.active {
-    background: gold;
+  &.active,
+  &:active,
+  &:hover {
     box-shadow: 0 0 5px 1px rgba(105, 105, 105, 0.7) inset;
   }
 
   &.disable {
     cursor: default;
+    box-shadow: none;
   }
 }

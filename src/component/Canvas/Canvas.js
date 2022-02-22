@@ -55,10 +55,12 @@ const Canvas = () => {
   );
   const [storedLayersNow, setStoredLayersNow] = useLocalStorage(
     "storedLayersNow",
-    []
+    -1
   );
 
   useEffect(() => {
+    if (!storedLayersHistory[storedLayersNow])
+      setStoredLayersNow(storedLayersHistory.length - 1);
     if (!layersHistory.length && storedLayersHistory.length > 0) {
       dispatch(canvas.actions.setLayersHitory(storedLayersHistory));
       dispatch(canvas.actions.setLayersNow(storedLayersNow));

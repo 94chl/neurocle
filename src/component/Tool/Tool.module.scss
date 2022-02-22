@@ -3,13 +3,60 @@
   width: 20vw;
   border: 1px solid #000;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 8px;
+
+  > div {
+    margin: 4px 0;
+    > h3 {
+      font-size: 1.2rem;
+      margin: 4px 0;
+    }
+  }
 
   .shapeButtonBox {
+    > div {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
   }
 
   .customInputBox {
+    > div {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
   }
 
   .controlButtonBox {
+    > div {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  }
+
+  .guideBox {
+    ul li {
+      word-break: keep-all;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 4px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      span {
+        &:first-child {
+          margin: 4px 0;
+          font-weight: 700;
+        }
+      }
+    }
   }
 }

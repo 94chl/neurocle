@@ -1,2 +1,13 @@
 .container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  input {
+    background: none;
+    border-radius: 5px;
+    &[type="color"] {
+      border: none;
+    }
+  }
 }

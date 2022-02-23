@@ -10,7 +10,7 @@ import { useLocalStorage } from "@/hook";
 
 const { container, stage } = styles;
 
-const layersHistoryLimit = 3;
+const layersHistoryLimit = 40;
 
 const Canvas = () => {
   const [canvasContainer, setCanvasContainer] = useState({

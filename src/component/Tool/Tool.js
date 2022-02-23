@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
+import React from "react";
 import classNames from "classnames";
 import styles from "./Tool.module.scss";
 import { Button, CustomInput } from "@/component";
@@ -49,7 +49,6 @@ const Tool = () => {
 
   const onChangeFillColorOpacity = () => {
     dispatch(canvas.actions.setFillColorTransparency());
-    // setFillColorTransparency();
   };
 
   const onChangeStrokeWidth = (e) => {

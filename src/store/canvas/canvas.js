@@ -7,9 +7,11 @@ export const canvas = createSlice({
     strokeColor: "#000000",
     strokeWidth: 5,
     fillColor: "#000000",
+    fillColorTransparency: true,
     shapes: [],
     layersHistory: [],
     layersNow: -1,
+    layersHistoryLimit: 40,
   },
   reducers: {
     seShapeType: (state, { payload }) => {
@@ -17,6 +19,9 @@ export const canvas = createSlice({
     },
     setColor: (state, { payload }) => {
       state[payload.target] = payload.value;
+    },
+    setFillColorTransparency: (state) => {
+      state.fillColorTransparency = !state.fillColorTransparency;
     },
     setStrokeWidth: (state, { payload }) => {
       state.strokeWidth = payload;

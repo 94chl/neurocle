@@ -24,29 +24,11 @@ const Tool = () => {
     strokeColor,
     strokeWidth,
     fillColor,
+    fillColorTransparency,
     layersHistory,
     layersNow,
+    layersHistoryLimit,
   } = useSelector((store) => store.canvas);
-  const [fillColorTransparency, setFillColorTransparency] = useState(true);
-  const [tempFillColor, setTempFillColr] = useState(fillColor);
-
-  useEffect(() => {
-    if (fillColorTransparency) {
-      dispatch(
-        canvas.actions.setColor({
-          target: "fillColor",
-          value: "transparent",
-        })
-      );
-    } else {
-      dispatch(
-        canvas.actions.setColor({
-          target: "fillColor",
-          value: tempFillColor,
-        })
-      );
-    }
-  }, [fillColorTransparency]);
 
   const [storedLayersHistory, setStoredLayersHistory] = useLocalStorage(
     "storedLayersHistory",
@@ -62,14 +44,12 @@ const Tool = () => {
   };
 
   const onChangeColor = (e, target) => {
-    setTempFillColr(e.target.value);
-    if (!fillColorTransparency) {
-      dispatch(canvas.actions.setColor({ target, value: e.target.value }));
-    }
+    dispatch(canvas.actions.setColor({ target, value: e.target.value }));
   };
 
-  const onChangeFillColorOpacity = (e) => {
-    setFillColorTransparency(e.target.checked);
+  const onChangeFillColorOpacity = () => {
+    dispatch(canvas.actions.setFillColorTransparency());
+    // setFillColorTransparency();
   };
 
   const onChangeStrokeWidth = (e) => {
@@ -118,9 +98,9 @@ const Tool = () => {
     setStoredLayersHistory(newLayersHistory);
 
     const nextIndex =
-      layersNow < layersHistory.length - 1
+      layersNow + 1 < layersHistoryLimit - 1
         ? layersNow + 1
-        : layersHistory.length - 1;
+        : layersHistoryLimit - 1;
     dispatch(canvas.actions.setLayersNow(nextIndex));
     setStoredLayersNow(nextIndex);
   };
@@ -194,14 +174,14 @@ const Tool = () => {
           <CustomInput
             inputId="fillColor"
             onChange={(e) => onChangeColor(e, "fillColor")}
-            value={fillColor === "transparent" ? tempFillColor : fillColor}
+            value={fillColor}
             inputOption={{ type: "color" }}
           >
             채우기 색상
           </CustomInput>
           <CustomInput
             inputId="fillColorTransparency"
-            onChange={(e) => onChangeFillColorOpacity(e)}
+            onChange={onChangeFillColorOpacity}
             value={0}
             inputOption={{ type: "checkbox", checked: fillColorTransparency }}
           >

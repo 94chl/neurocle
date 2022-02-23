@@ -10,8 +10,6 @@ import { useLocalStorage } from "@/hook";
 
 const { container, stage } = styles;
 
-const layersHistoryLimit = 40;
-
 const Canvas = () => {
   const [canvasContainer, setCanvasContainer] = useState({
     width: 0,
@@ -45,8 +43,10 @@ const Canvas = () => {
     strokeColor,
     strokeWidth,
     fillColor,
+    fillColorTransparency,
     layersHistory,
     layersNow,
+    layersHistoryLimit,
   } = useSelector((store) => store.canvas);
 
   const [storedLayersHistory, setStoredLayersHistory] = useLocalStorage(
@@ -85,6 +85,7 @@ const Canvas = () => {
     strokeColor,
     strokeWidth,
     fillColor,
+    fillColorTransparency,
   });
 
   const [isDrawing, setIsDrawing] = useState(false);
@@ -126,6 +127,7 @@ const Canvas = () => {
       strokeColor,
       strokeWidth,
       fillColor,
+      fillColorTransparency,
     };
 
     setShape(newShape);
@@ -142,6 +144,7 @@ const Canvas = () => {
       strokeColor,
       strokeWidth,
       fillColor,
+      fillColorTransparency,
     });
     setShapePoints([]);
     setIsDrawing(false);
@@ -156,8 +159,8 @@ const Canvas = () => {
     const newShapes = [...shapes];
 
     const newLayersHistory =
-      layersNow <= layersHistoryLimit
-        ? layersHistory.filter((_, index) => index <= layersNow)
+      layersNow < layersHistoryLimit
+        ? layersHistory.filter((_, index) => index < layersNow)
         : layersHistory.filter(
             (_, index) => index > 0 && index < layersHistoryLimit
           );
@@ -179,7 +182,7 @@ const Canvas = () => {
     dispatch(canvas.actions.setLayersHitory(newLayersHistory));
 
     const nextIndex =
-      layersNow + 1 < layersHistoryLimit
+      layersNow + 1 < layersHistoryLimit - 1
         ? layersNow + 1
         : layersHistoryLimit - 1;
     setStoredLayersNow(nextIndex);
@@ -232,7 +235,11 @@ const Canvas = () => {
               if (shape?.type === "ellipse") {
                 return (
                   <Ellipse
-                    fill={shape.fillColor}
+                    fill={
+                      shape.fillColorTransparency
+                        ? "transparent"
+                        : shape.fillColor
+                    }
                     stroke={shape.strokeColor}
                     strokeWidth={shape.strokeWidth}
                     x={shape.x}
@@ -246,7 +253,11 @@ const Canvas = () => {
               if (shape?.type === "rect") {
                 return (
                   <Rect
-                    fill={shape.fillColor}
+                    fill={
+                      shape.fillColorTransparency
+                        ? "transparent"
+                        : shape.fillColor
+                    }
                     stroke={shape.strokeColor}
                     strokeWidth={shape.strokeWidth}
                     x={shape.x}
@@ -260,7 +271,11 @@ const Canvas = () => {
               if (shape?.type === "polygon") {
                 return (
                   <Line
-                    fill={shape.fillColor}
+                    fill={
+                      shape.fillColorTransparency
+                        ? "transparent"
+                        : shape.fillColor
+                    }
                     stroke={shape.strokeColor}
                     strokeWidth={shape.strokeWidth}
                     points={shape.points}
@@ -287,7 +302,7 @@ const Canvas = () => {
           )}
           {shapeType === "ellipse" && (
             <Ellipse
-              fill={fillColor}
+              fill={fillColorTransparency ? "transparent" : fillColor}
               stroke={strokeColor}
               strokeWidth={strokeWidth}
               x={shape.x}
@@ -298,9 +313,9 @@ const Canvas = () => {
           )}
           {shapeType === "rect" && (
             <Rect
+              fill={fillColorTransparency ? "transparent" : fillColor}
               stroke={strokeColor}
               strokeWidth={strokeWidth}
-              fill={fillColor}
               x={shape.x}
               y={shape.y}
               width={shape.width}
@@ -309,7 +324,7 @@ const Canvas = () => {
           )}
           {shapeType === "polygon" && (
             <Line
-              fill={fillColor}
+              fill={fillColorTransparency ? "transparent" : fillColor}
               stroke={strokeColor}
               strokeWidth={strokeWidth}
               points={shapePoints}

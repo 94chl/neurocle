@@ -40,11 +40,11 @@ const Canvas = () => {
 
   const dispatch = useDispatch();
   const {
+    shapes,
     shapeType,
     strokeColor,
     strokeWidth,
     fillColor,
-    shapes,
     layersHistory,
     layersNow,
   } = useSelector((store) => store.canvas);
@@ -66,7 +66,9 @@ const Canvas = () => {
       dispatch(canvas.actions.setLayersNow(storedLayersNow));
       dispatch(
         canvas.actions.setShapes(
-          storedLayersNow < 0 ? [] : storedLayersHistory[storedLayersNow]
+          !storedLayersHistory[storedLayersNow]
+            ? []
+            : storedLayersHistory[storedLayersNow]
         )
       );
     }
@@ -200,69 +202,70 @@ const Canvas = () => {
         height={canvasContainer.height}
       >
         <Layer>
-          {shapes.map((shape, index) => {
-            if (shape?.type === "line") {
-              return (
-                <Line
-                  stroke={shape.strokeColor}
-                  strokeWidth={shape.strokeWidth}
-                  points={shape.points}
-                  key={`${shape.type}-${index}`}
-                ></Line>
-              );
-            }
-            if (shape?.type === "spline") {
-              return (
-                <Line
-                  stroke={shape.strokeColor}
-                  strokeWidth={shape.strokeWidth}
-                  points={shape.points}
-                  tension={0.5}
-                  key={`${shape.type}-${index}`}
-                ></Line>
-              );
-            }
-            if (shape?.type === "ellipse") {
-              return (
-                <Ellipse
-                  fill={shape.fillColor}
-                  stroke={shape.strokeColor}
-                  strokeWidth={shape.strokeWidth}
-                  x={shape.x}
-                  y={shape.y}
-                  width={shape.width}
-                  height={shape.height}
-                  key={`${shape.type}-${index}`}
-                ></Ellipse>
-              );
-            }
-            if (shape?.type === "rect") {
-              return (
-                <Rect
-                  fill={shape.fillColor}
-                  stroke={shape.strokeColor}
-                  strokeWidth={shape.strokeWidth}
-                  x={shape.x}
-                  y={shape.y}
-                  width={shape.width}
-                  height={shape.height}
-                  key={`${shape.type}-${index}`}
-                ></Rect>
-              );
-            }
-            if (shape?.type === "polygon") {
-              return (
-                <Line
-                  fill={shape.fillColor}
-                  stroke={shape.strokeColor}
-                  strokeWidth={shape.strokeWidth}
-                  points={shape.points}
-                  closed={true}
-                  key={`${shape.type}-${index}`}
-                ></Line>
-              );
-            }
-          })}
+          {shapes &&
+            shapes.map((shape, index) => {
+              if (shape?.type === "line") {
+                return (
+                  <Line
+                    stroke={shape.strokeColor}
+                    strokeWidth={shape.strokeWidth}
+                    points={shape.points}
+                    key={`${shape.type}-${index}`}
+                  ></Line>
+                );
+              }
+              if (shape?.type === "spline") {
+                return (
+                  <Line
+                    stroke={shape.strokeColor}
+                    strokeWidth={shape.strokeWidth}
+                    points={shape.points}
+                    tension={0.5}
+                    key={`${shape.type}-${index}`}
+                  ></Line>
+                );
+              }
+              if (shape?.type === "ellipse") {
+                return (
+                  <Ellipse
+                    fill={shape.fillColor}
+                    stroke={shape.strokeColor}
+                    strokeWidth={shape.strokeWidth}
+                    x={shape.x}
+                    y={shape.y}
+                    width={shape.width}
+                    height={shape.height}
+                    key={`${shape.type}-${index}`}
+                  ></Ellipse>
+                );
+              }
+              if (shape?.type === "rect") {
+                return (
+                  <Rect
+                    fill={shape.fillColor}
+                    stroke={shape.strokeColor}
+                    strokeWidth={shape.strokeWidth}
+                    x={shape.x}
+                    y={shape.y}
+                    width={shape.width}
+                    height={shape.height}
+                    key={`${shape.type}-${index}`}
+                  ></Rect>
+                );
+              }
+              if (shape?.type === "polygon") {
+                return (
+                  <Line
+                    fill={shape.fillColor}
+                    stroke={shape.strokeColor}
+                    strokeWidth={shape.strokeWidth}
+                    points={shape.points}
+                    closed={true}
+                    key={`${shape.type}-${index}`}
+                  ></Line>
+                );
+              }
+            })}
           {shapeType === "line" && (
             <Line
               stroke={strokeColor}

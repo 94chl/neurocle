@@ -201,7 +201,7 @@ const Canvas = () => {
       >
         <Layer>
           {shapes.map((shape, index) => {
-            if (shape.type === "line") {
+            if (shape?.type === "line") {
               return (
                 <Line
                   stroke={shape.strokeColor}
@@ -211,7 +211,7 @@ const Canvas = () => {
                 ></Line>
               );
             }
-            if (shape.type === "spline") {
+            if (shape?.type === "spline") {
               return (
                 <Line
                   stroke={shape.strokeColor}
@@ -222,7 +222,7 @@ const Canvas = () => {
                 ></Line>
               );
             }
-            if (shape.type === "ellipse") {
+            if (shape?.type === "ellipse") {
               return (
                 <Ellipse
                   fill={shape.fillColor}
@@ -236,7 +236,7 @@ const Canvas = () => {
                 ></Ellipse>
               );
             }
-            if (shape.type === "rect") {
+            if (shape?.type === "rect") {
               return (
                 <Rect
                   fill={shape.fillColor}
@@ -250,7 +250,7 @@ const Canvas = () => {
                 ></Rect>
               );
             }
-            if (shape.type === "polygon") {
+            if (shape?.type === "polygon") {
               return (
                 <Line
                   fill={shape.fillColor}

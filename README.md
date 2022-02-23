@@ -1,6 +1,6 @@
 # neurocle drwaing tool works
 
-로컬: `yarn install`을 통해 의존성 모듈 설치 후, `yarn start`를 통해 확인
+로컬: `yarn install`을 통해 의존성 모듈 설치 후, `yarn start`를 통해 확인  
 배포 : [링크](https://94chl.github.io/neurocle/)
 
 ## 소개

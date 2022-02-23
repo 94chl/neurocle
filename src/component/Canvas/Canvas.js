@@ -186,7 +186,7 @@ const Canvas = () => {
     <div
       className={classNames(container)}
       ref={canvasRef}
-      onMouseDown={(e) => !isStitching && onSetStartPoint(e)}
+      onMouseDown={(e) => e.button === 0 && !isStitching && onSetStartPoint(e)}
       onMouseUp={() => !isStitching && finishAdjustShape(false)}
       onClick={(e) => isStitching && onSetStartPoint(e)}
       onMouseMove={(e) => isDrawing && onAdjustShape(e)}

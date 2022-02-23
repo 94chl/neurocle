@@ -116,8 +116,13 @@ const Tool = () => {
     dispatch(canvas.actions.setShapes([]));
     dispatch(canvas.actions.setLayersHitory(newLayersHistory));
     setStoredLayersHistory(newLayersHistory);
-    dispatch(canvas.actions.setLayersNow(layersNow + 1));
-    setStoredLayersNow(layersNow + 1);
+
+    const nextIndex =
+      layersNow < layersHistory.length - 1
+        ? layersNow + 1
+        : layersHistory.length - 1;
+    dispatch(canvas.actions.setLayersNow(nextIndex));
+    setStoredLayersNow(nextIndex);
   };
 
   const resetLayers = () => {

@@ -178,8 +178,12 @@ const Canvas = () => {
     setStoredLayersHistory(newLayersHistory);
     dispatch(canvas.actions.setLayersHitory(newLayersHistory));
 
-    setStoredLayersNow(layersNow + 1);
-    dispatch(canvas.actions.setLayersNow(layersNow + 1));
+    const nextIndex =
+      layersNow + 1 < layersHistoryLimit
+        ? layersNow + 1
+        : layersHistoryLimit - 1;
+    setStoredLayersNow(nextIndex);
+    dispatch(canvas.actions.setLayersNow(nextIndex));
 
     initializeShape();
   };

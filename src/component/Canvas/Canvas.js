@@ -34,7 +34,7 @@ const Canvas = () => {
 
     window.addEventListener("resize", canvasResize);
     return () => window.removeEventListener("resize", canvasResize);
-  }, [canvasRef]);
+  }, []);
 
   const dispatch = useDispatch();
   const {
@@ -59,9 +59,10 @@ const Canvas = () => {
   );
 
   useEffect(() => {
-    if (!storedLayersHistory[storedLayersNow])
+    if (storedLayersHistory[storedLayersNow] < 0)
       setStoredLayersNow(storedLayersHistory.length - 1);
-    if (!layersHistory.length && storedLayersHistory.length > 0) {
+
+    if (!layersHistory.length && storedLayersHistory.length) {
       dispatch(canvas.actions.setLayersHitory(storedLayersHistory));
       dispatch(canvas.actions.setLayersNow(storedLayersNow));
       dispatch(
@@ -157,14 +158,14 @@ const Canvas = () => {
     }
 
     const newShapes = [...shapes];
-
     const newLayersHistory =
-      layersNow < layersHistoryLimit
-        ? layersHistory.filter((_, index) => index < layersNow)
+      layersNow < layersHistoryLimit - 1
+        ? layersHistory.filter((_, index) => index <= layersNow)
         : layersHistory.filter(
-            (_, index) => index > 0 && index < layersHistoryLimit
+            (_, index) =>
+              layersHistory.length - layersHistoryLimit + 1 <= index &&
+              index < layersHistoryLimit
           );
-
     if (isReset && isStitching) {
       const newShape = {
         ...shape,

@@ -89,18 +89,18 @@ const Canvas = () => {
     fillColorTransparency,
   });
 
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [isStitching, setIsStitching] = useState(false);
+  const isDrawing = useRef(false);
+  const isStitching = useRef(false);
 
   useEffect(() => {
-    ["spline", "polygon"].includes(shapeType)
-      ? setIsStitching(true)
-      : setIsStitching(false);
+    isStitching.current = ["spline", "polygon"].includes(shapeType)
+      ? true
+      : false;
   }, [shapeType]);
 
-  const onSetStartPoint = (e) => {
+  const onSetPoint = (e) => {
     setShapePoints([...shapePoints, e.pageX, e.pageY]);
-    setIsDrawing(true);
+    isDrawing.current = true;
   };
 
   const onAdjustShape = (e) => {
@@ -148,11 +148,11 @@ const Canvas = () => {
       fillColorTransparency,
     });
     setShapePoints([]);
-    setIsDrawing(false);
+    isDrawing.current = !isDrawing.current;
   };
 
   const finishAdjustShape = (isReset) => {
-    if (isReset && !isStitching) {
+    if (isReset && !isStitching.current) {
       initializeShape();
       return;
     }
@@ -166,7 +166,7 @@ const Canvas = () => {
               layersHistory.length - layersHistoryLimit + 1 <= index &&
               index < layersHistoryLimit
           );
-    if (isReset && isStitching) {
+    if (isReset && isStitching.current) {
       const newShape = {
         ...shape,
         points: shapePoints.slice(0, shapePoints.length - 2),
@@ -196,11 +196,13 @@ const Canvas = () => {
     <div
       className={classNames(container)}
       ref={canvasRef}
-      onMouseDown={(e) => e.button === 0 && !isStitching && onSetStartPoint(e)}
-      onMouseUp={() => !isStitching && finishAdjustShape(false)}
-      onClick={(e) => isStitching && onSetStartPoint(e)}
-      onMouseMove={(e) => isDrawing && onAdjustShape(e)}
-      onDoubleClick={() => isStitching && finishAdjustShape(false)}
+      onMouseDown={(e) =>
+        e.button === 0 && !isStitching.current && onSetPoint(e)
+      }
+      onMouseUp={() => !isStitching.current && finishAdjustShape(false)}
+      onClick={(e) => isStitching.current && onSetPoint(e)}
+      onMouseMove={(e) => isDrawing.current && onAdjustShape(e)}
+      onDoubleClick={() => isStitching.current && finishAdjustShape(false)}
       onKeyDown={(e) => e.key === "Escape" && finishAdjustShape(true)}
       tabIndex="0"
     >

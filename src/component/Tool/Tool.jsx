@@ -114,8 +114,17 @@ const Tool = () => {
     }
   };
 
+  const throwError = () => {
+    try {
+      throw new Error("Sentry Test Error");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <div className={classNames(container)}>
+      <Button onClick={throwError}>에러발생</Button>
       <div className={classNames(shapeButtonBox)}>
         <h3>드로잉 타입</h3>
         <div>

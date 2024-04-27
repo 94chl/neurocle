@@ -41,5 +41,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@sentry/react": "^7.112.2",
+    "@sentry/wizard": "^3.22.1"
   }
 }

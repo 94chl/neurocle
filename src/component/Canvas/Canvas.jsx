@@ -7,6 +7,7 @@ import { Stage, Layer, Rect, Ellipse, Line } from "react-konva";
 import { useDispatch, useSelector } from "react-redux";
 import { canvas } from "@/store/canvas/canvas";
 import { useLocalStorage } from "@/hook";
+import * as Sentry from "@sentry/react";
 
 const { container, stage } = styles;
 
@@ -108,6 +109,7 @@ const Canvas = () => {
       isDrawing.current = true;
     } catch (e) {
       console.error(e);
+      Sentry.captureException(e);
       setShapePoints([]);
       isDrawing.current = false;
     }

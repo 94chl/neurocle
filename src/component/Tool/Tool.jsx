@@ -7,6 +7,7 @@ import { Button, CustomInput } from "@/component";
 import { useDispatch, useSelector } from "react-redux";
 import { canvas } from "@/store/canvas/canvas";
 import { useLocalStorage } from "@/hook";
+import * as Sentry from "@sentry/react";
 
 const {
   container,
@@ -119,6 +120,7 @@ const Tool = () => {
       throw new Error("Sentry: Button Error");
     } catch (e) {
       console.error(e);
+      Sentry.captureException(e);
     }
   };
 

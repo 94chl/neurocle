@@ -116,7 +116,7 @@ const Tool = () => {
 
   const throwError = () => {
     try {
-      throw new Error("Sentry Test Error");
+      throw new Error("Sentry: Button Error");
     } catch (e) {
       console.error(e);
     }

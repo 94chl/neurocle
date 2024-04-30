@@ -99,8 +99,18 @@ const Canvas = () => {
   }, [shapeType]);
 
   const onSetPoint = (e) => {
-    setShapePoints([...shapePoints, e.pageX, e.pageY]);
-    isDrawing.current = true;
+    try {
+      if (shapePoints.length > 10) {
+        throw new Error("Sentry: shape points Error");
+      } else {
+        setShapePoints([...shapePoints, e.pageX, e.pageY]);
+      }
+      isDrawing.current = true;
+    } catch (e) {
+      console.error(e);
+      setShapePoints([]);
+      isDrawing.current = false;
+    }
   };
 
   const onAdjustShape = (e) => {

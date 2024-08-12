@@ -22,10 +22,7 @@ const Tool = () => {
   const {
     shapes,
     shapeType,
-    strokeColor,
-    strokeWidth,
     fillColor,
-    fillColorTransparency,
     layersHistory,
     layersNow,
     layersHistoryLimit,
@@ -46,17 +43,6 @@ const Tool = () => {
 
   const onChangeColor = (e, target) => {
     dispatch(canvas.actions.setColor({ target, value: e.target.value }));
-  };
-
-  const onChangeFillColorOpacity = () => {
-    dispatch(canvas.actions.setFillColorTransparency());
-  };
-
-  const onChangeStrokeWidth = (e) => {
-    const value = parseInt(e.target.value);
-    dispatch(
-      canvas.actions.setStrokeWidth(value > 50 ? 50 : value < 5 ? 5 : value)
-    );
   };
 
   const undo = () => {
@@ -166,36 +152,12 @@ const Tool = () => {
         <h3>드로잉 옵션</h3>
         <div>
           <CustomInput
-            inputId="strokeColor"
-            onChange={(e) => onChangeColor(e, "strokeColor")}
-            value={strokeColor}
-            inputOption={{ type: "color" }}
-          >
-            테두리 색상
-          </CustomInput>
-          <CustomInput
-            inputId="strokeWidth"
-            onChange={(e) => onChangeStrokeWidth(e)}
-            value={strokeWidth}
-            inputOption={{ type: "number", min: 5, max: 50 }}
-          >
-            테두리 두께
-          </CustomInput>
-          <CustomInput
             inputId="fillColor"
             onChange={(e) => onChangeColor(e, "fillColor")}
             value={fillColor}
             inputOption={{ type: "color" }}
           >
             채우기 색상
-          </CustomInput>
-          <CustomInput
-            inputId="fillColorTransparency"
-            onChange={onChangeFillColorOpacity}
-            value={0}
-            inputOption={{ type: "checkbox", checked: fillColorTransparency }}
-          >
-            채우기 없음
           </CustomInput>
         </div>
       </div>

@@ -7,7 +7,7 @@ import { Stage, Layer, Rect, Ellipse, Line } from "react-konva";
 import { useDispatch, useSelector } from "react-redux";
 import { canvas } from "@/store/canvas/canvas";
 import { useLocalStorage } from "@/hook";
-import * as Sentry from "@sentry/react";
+import { shapeEnum } from "@/const";
 
 const { container, stage } = styles;
 
@@ -41,10 +41,7 @@ const Canvas = () => {
   const {
     shapes,
     shapeType,
-    strokeColor,
-    strokeWidth,
     fillColor,
-    fillColorTransparency,
     layersHistory,
     layersNow,
     layersHistoryLimit,
@@ -84,36 +81,17 @@ const Canvas = () => {
     width: 0,
     height: 0,
     points: [],
-    strokeColor,
-    strokeWidth,
     fillColor,
-    fillColorTransparency,
   });
 
   const isDrawing = useRef(false);
   const isStitching = useRef(false);
 
   useEffect(() => {
-    isStitching.current = ["spline", "polygon"].includes(shapeType)
+    isStitching.current = [shapeEnum.polygon].includes(shapeType)
       ? true
       : false;
   }, [shapeType]);
-
-  const onSetPoint = (e) => {
-    try {
-      if (shapePoints.length > 10) {
-        throw new Error("Sentry: shape points Error");
-      } else {
-        setShapePoints([...shapePoints, e.pageX, e.pageY]);
-      }
-      isDrawing.current = true;
-    } catch (e) {
-      console.error(e);
-      Sentry.captureException(e);
-      setShapePoints([]);
-      isDrawing.current = false;
-    }
-  };
 
   const onAdjustShape = (e) => {
     setShapePoints([
@@ -137,10 +115,7 @@ const Canvas = () => {
       width: Math.abs(width),
       height: Math.abs(height),
       points: [...shapePoints],
-      strokeColor,
-      strokeWidth,
       fillColor,
-      fillColorTransparency,
     };
 
     setShape(newShape);
@@ -154,10 +129,7 @@ const Canvas = () => {
       width: 0,
       height: 0,
       points: [],
-      strokeColor,
-      strokeWidth,
       fillColor,
-      fillColorTransparency,
     });
     setShapePoints([]);
     isDrawing.current = !isDrawing.current;
@@ -208,11 +180,9 @@ const Canvas = () => {
     <div
       className={classNames(container)}
       ref={canvasRef}
-      onMouseDown={(e) =>
-        e.button === 0 && !isStitching.current && onSetPoint(e)
-      }
+      onMouseDown={(e) => e.button === 0 && !isStitching.current}
       onMouseUp={() => !isStitching.current && finishAdjustShape(false)}
-      onClick={(e) => isStitching.current && onSetPoint(e)}
+      onClick={(e) => isStitching.current}
       onMouseMove={(e) => isDrawing.current && onAdjustShape(e)}
       onDoubleClick={() => isStitching.current && finishAdjustShape(false)}
       onKeyDown={(e) => e.key === "Escape" && finishAdjustShape(true)}
@@ -226,37 +196,10 @@ const Canvas = () => {
         <Layer>
           {shapes &&
             shapes.map((shape, index) => {
-              if (shape?.type === "line") {
-                return (
-                  <Line
-                    stroke={shape.strokeColor}
-                    strokeWidth={shape.strokeWidth}
-                    points={shape.points}
-                    key={`${shape.type}-${index}`}
-                  ></Line>
-                );
-              }
-              if (shape?.type === "spline") {
-                return (
-                  <Line
-                    stroke={shape.strokeColor}
-                    strokeWidth={shape.strokeWidth}
-                    points={shape.points}
-                    tension={0.5}
-                    key={`${shape.type}-${index}`}
-                  ></Line>
-                );
-              }
-              if (shape?.type === "ellipse") {
+              if (shape?.type === shapeEnum.ellipse) {
                 return (
                   <Ellipse
-                    fill={
-                      shape.fillColorTransparency
-                        ? "transparent"
-                        : shape.fillColor
-                    }
-                    stroke={shape.strokeColor}
-                    strokeWidth={shape.strokeWidth}
+                    fill={shape.fillColor}
                     x={shape.x}
                     y={shape.y}
                     width={shape.width}
@@ -265,16 +208,10 @@ const Canvas = () => {
                   ></Ellipse>
                 );
               }
-              if (shape?.type === "rect") {
+              if (shape?.type === shapeEnum.rect) {
                 return (
                   <Rect
-                    fill={
-                      shape.fillColorTransparency
-                        ? "transparent"
-                        : shape.fillColor
-                    }
-                    stroke={shape.strokeColor}
-                    strokeWidth={shape.strokeWidth}
+                    fill={shape.fillColor}
                     x={shape.x}
                     y={shape.y}
                     width={shape.width}
@@ -283,16 +220,10 @@ const Canvas = () => {
                   ></Rect>
                 );
               }
-              if (shape?.type === "polygon") {
+              if (shape?.type === shapeEnum.polygon) {
                 return (
                   <Line
-                    fill={
-                      shape.fillColorTransparency
-                        ? "transparent"
-                        : shape.fillColor
-                    }
-                    stroke={shape.strokeColor}
-                    strokeWidth={shape.strokeWidth}
+                    fill={shape.fillColor}
                     points={shape.points}
                     closed={true}
                     key={`${shape.type}-${index}`}
@@ -300,51 +231,26 @@ const Canvas = () => {
                 );
               }
             })}
-          {shapeType === "line" && (
-            <Line
-              stroke={strokeColor}
-              strokeWidth={strokeWidth}
-              points={shape.points}
-            ></Line>
-          )}
-          {shapeType === "spline" && (
-            <Line
-              stroke={strokeColor}
-              strokeWidth={strokeWidth}
-              points={shapePoints}
-              tension={0.5}
-            ></Line>
-          )}
-          {shapeType === "ellipse" && (
+          {shapeType === shapeEnum.ellipse && (
             <Ellipse
-              fill={fillColorTransparency ? "transparent" : fillColor}
-              stroke={strokeColor}
-              strokeWidth={strokeWidth}
+              fill={fillColor}
               x={shape.x}
               y={shape.y}
               width={shape.width}
               height={shape.height}
             ></Ellipse>
           )}
-          {shapeType === "rect" && (
+          {shapeType === shapeEnum.rect && (
             <Rect
-              fill={fillColorTransparency ? "transparent" : fillColor}
-              stroke={strokeColor}
-              strokeWidth={strokeWidth}
+              fill={fillColor}
               x={shape.x}
               y={shape.y}
               width={shape.width}
               height={shape.height}
             ></Rect>
           )}
-          {shapeType === "polygon" && (
-            <Line
-              fill={fillColorTransparency ? "transparent" : fillColor}
-              stroke={strokeColor}
-              strokeWidth={strokeWidth}
-              points={shapePoints}
-              closed={true}
-            ></Line>
+          {shapeType === shapeEnum.polygon && (
+            <Line fill={fillColor} points={shapePoints} closed={true}></Line>
           )}
         </Layer>
       </Stage>

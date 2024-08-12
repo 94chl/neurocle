@@ -1,13 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { shapeEnum } from "@/const";
 
 export const canvas = createSlice({
   name: "canvas",
   initialState: {
-    shapeType: "rect",
-    strokeColor: "#000000",
-    strokeWidth: 5,
+    shapeType: shapeEnum.rect,
     fillColor: "#000000",
-    fillColorTransparency: true,
     shapes: [],
     layersHistory: [],
     layersNow: -1,
@@ -19,12 +17,6 @@ export const canvas = createSlice({
     },
     setColor: (state, { payload }) => {
       state[payload.target] = payload.value;
-    },
-    setFillColorTransparency: (state) => {
-      state.fillColorTransparency = !state.fillColorTransparency;
-    },
-    setStrokeWidth: (state, { payload }) => {
-      state.strokeWidth = payload;
     },
     setShapes: (state, { payload }) => {
       state.shapes = payload;

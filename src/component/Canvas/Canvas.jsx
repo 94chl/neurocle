@@ -1,13 +1,15 @@
-/* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useState, useEffect } from "react";
 import classNames from "classnames";
 import styles from "./Canvas.module.scss";
-import { Stage, Layer, Rect, Ellipse, Line } from "react-konva";
+import { Stage, Layer } from "react-konva";
 import { useDispatch, useSelector } from "react-redux";
 import { canvas } from "../../store/canvas/canvas";
 import { useLocalStorage } from "../../hook";
 import { toolEnum } from "../../const";
+import RectDrawable from "../Drawable/RectDrawable";
+import EllipseDrawable from "../Drawable/EllipseDrawable";
+import PolygonDrawable from "../Drawable/PolygonDrawable";
 
 const { container, stage } = styles;
 
@@ -40,8 +42,8 @@ const Canvas = () => {
 
   const dispatch = useDispatch();
   const {
-    shapes,
-    shapeType,
+    drawables,
+    drawableType,
     fillColor,
     layersHistory,
     layersNow,
@@ -65,7 +67,7 @@ const Canvas = () => {
       dispatch(canvas.actions.setLayersHitory(storedLayersHistory));
       dispatch(canvas.actions.setLayersNow(storedLayersNow));
       dispatch(
-        canvas.actions.setShapes(
+        canvas.actions.setDrawables(
           !storedLayersHistory[storedLayersNow]
             ? []
             : storedLayersHistory[storedLayersNow]
@@ -74,9 +76,9 @@ const Canvas = () => {
     }
   }, []);
 
-  const [shapePoints, setShapePoints] = useState([]);
-  const [shape, setShape] = useState({
-    type: shapeType,
+  const [drawablePoints, setDrawablePoints] = useState([]);
+  const [drawable, setDrawable] = useState({
+    type: drawableType,
     x: 0,
     y: 0,
     width: 0,
@@ -86,43 +88,10 @@ const Canvas = () => {
   });
 
   const isDrawing = useRef(false);
-  const isStitching = useRef(false);
 
-  useEffect(() => {
-    isStitching.current = [toolEnum.polygon].includes(shapeType) ? true : false;
-  }, [shapeType]);
-
-  const onAdjustShape = (e) => {
-    setShapePoints([
-      ...shapePoints.slice(
-        0,
-        shapePoints.length > 2 ? shapePoints.length - 2 : 2
-      ),
-      e.pageX,
-      e.pageY,
-    ]);
-
-    const width = shapePoints[0] - shapePoints[shapePoints.length - 2];
-    const height = shapePoints[1] - shapePoints[shapePoints.length - 1];
-    const x = width < 0 ? shapePoints[0] : shapePoints[shapePoints.length - 2];
-    const y = height < 0 ? shapePoints[1] : shapePoints[shapePoints.length - 1];
-
-    const newShape = {
-      type: shapeType,
-      x: shapeType === "ellipse" ? x + Math.abs(width) / 2 : x,
-      y: shapeType === "ellipse" ? y + Math.abs(height) / 2 : y,
-      width: Math.abs(width),
-      height: Math.abs(height),
-      points: [...shapePoints],
-      fillColor,
-    };
-
-    setShape(newShape);
-  };
-
-  const initializeShape = () => {
-    setShape({
-      type: shapeType,
+  const initializeDrawable = () => {
+    setDrawable({
+      type: drawableType,
       x: 0,
       y: 0,
       width: 0,
@@ -130,29 +99,72 @@ const Canvas = () => {
       points: [],
       fillColor,
     });
-    setShapePoints([]);
-    isDrawing.current = !isDrawing.current;
+    setDrawablePoints([]);
+    isDrawing.current = false;
   };
 
-  const selectShape = () => {
-    if (shapeType !== toolEnum.select) return;
-    if (stage?.ref) {
-      const pointerPosition = stage.getPointerPosition();
-      const element = stage.getIntersection(pointerPosition);
-
-      console.log("SELECT", element);
-    }
-  };
-
-  const finishAdjustShape = (isReset) => {
-    if (isReset && !isStitching.current) {
-      initializeShape();
+  const drawingDrawable = (e) => {
+    if (!isDrawing.current) {
       return;
     }
 
-    selectShape();
+    const width = drawablePoints[0] - drawablePoints[drawablePoints.length - 2];
+    const height =
+      drawablePoints[1] - drawablePoints[drawablePoints.length - 1];
+    const x =
+      width < 0 ? drawablePoints[0] : drawablePoints[drawablePoints.length - 2];
+    const y =
+      height < 0
+        ? drawablePoints[1]
+        : drawablePoints[drawablePoints.length - 1];
 
-    const newShapes = [...shapes];
+    const newDrawable = {
+      type: drawableType,
+      x,
+      y,
+      width,
+      height,
+      points: [...drawablePoints],
+      fillColor,
+    };
+
+    const newDrawablePoints = [
+      ...drawablePoints.slice(
+        0,
+        drawablePoints.length > 2 ? drawablePoints.length - 2 : 2
+      ),
+      e.pageX,
+      e.pageY,
+    ];
+    setDrawablePoints(newDrawablePoints);
+    newDrawable.drawablePoints = newDrawablePoints;
+
+    setDrawable(newDrawable);
+  };
+
+  const selectDrawable = () => {
+    if (stageRef?.current) {
+      const pointerPosition = stageRef.current?.getPointerPosition();
+      const element = stageRef.current?.getIntersection(pointerPosition);
+
+      console.log("SELECT", element);
+      isDrawing.current = false;
+    }
+  };
+
+  const finishDrawingDrawable = () => {
+    console.log("FINISH");
+    if (!isDrawing.current) {
+      initializeDrawable();
+      return;
+    }
+
+    if (drawableType === toolEnum.select) {
+      selectDrawable();
+      return;
+    }
+
+    const newDrawables = [...drawables];
     const newLayersHistory =
       layersNow < layersHistoryLimit - 1
         ? layersHistory.filter((_, index) => index <= layersNow)
@@ -161,19 +173,17 @@ const Canvas = () => {
               layersHistory.length - layersHistoryLimit + 1 <= index &&
               index < layersHistoryLimit
           );
-    if (isReset && isStitching.current) {
-      const newShape = {
-        ...shape,
-        points: shapePoints.slice(0, shapePoints.length - 2),
-      };
-      newShapes.push(newShape);
-    } else {
-      newShapes.push(shape);
-    }
 
-    dispatch(canvas.actions.setShapes(newShapes));
+    const newDrawable = {
+      ...drawable,
+      points: drawablePoints.slice(0, drawablePoints.length - 2),
+    };
+    console.log("NEW", newDrawable);
+    newDrawables.push(newDrawable);
 
-    newLayersHistory.push(newShapes);
+    dispatch(canvas.actions.setDrawables(newDrawables));
+
+    newLayersHistory.push(newDrawables);
     setStoredLayersHistory(newLayersHistory);
     dispatch(canvas.actions.setLayersHitory(newLayersHistory));
 
@@ -184,19 +194,106 @@ const Canvas = () => {
     setStoredLayersNow(nextIndex);
     dispatch(canvas.actions.setLayersNow(nextIndex));
 
-    initializeShape();
+    initializeDrawable();
+  };
+
+  const startDrawDrawable = (e) => {
+    console.log("START DRAW", e);
+    if (isDrawing.current === false) {
+      isDrawing.current = true;
+      drawingDrawable(e);
+    } else {
+      if (drawableType === toolEnum.polygon) {
+        console.log("add polygon point");
+      } else {
+        initializeDrawable();
+      }
+    }
+  };
+
+  const Drawables = () =>
+    drawables.map((drawable, index) => {
+      console.log(drawable);
+      switch (drawable.type) {
+        case toolEnum.ellipse:
+          return (
+            <EllipseDrawable
+              color={drawable.fillColor}
+              x={drawable.x}
+              y={drawable.y}
+              width={drawable.width}
+              height={drawable.height}
+              key={`${drawable.type}-${index}`}
+            ></EllipseDrawable>
+          );
+        case toolEnum.rect:
+          return (
+            <RectDrawable
+              color={drawable.fillColor}
+              x={drawable.x}
+              y={drawable.y}
+              width={drawable.width}
+              height={drawable.height}
+              key={`${drawable.type}-${index}`}
+            ></RectDrawable>
+          );
+        case toolEnum.polygon:
+          return (
+            <PolygonDrawable
+              color={drawable.fillColor}
+              points={drawable.points}
+              closed={true}
+              key={`${drawable.type}-${index}`}
+            ></PolygonDrawable>
+          );
+        default:
+          return null;
+      }
+    });
+
+  const DrawingDrawable = () => {
+    switch (drawable.type) {
+      case toolEnum.ellipse:
+        return (
+          <EllipseDrawable
+            color={drawable.fillColor}
+            x={drawable.x}
+            y={drawable.y}
+            width={drawable.width}
+            height={drawable.height}
+          ></EllipseDrawable>
+        );
+      case toolEnum.rect:
+        return (
+          <RectDrawable
+            color={drawable.fillColor}
+            x={drawable.x}
+            y={drawable.y}
+            width={drawable.width}
+            height={drawable.height}
+          ></RectDrawable>
+        );
+      case toolEnum.polygon:
+        return (
+          <PolygonDrawable
+            color={drawable.fillColor}
+            points={drawable.points}
+            closed={true}
+          ></PolygonDrawable>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
     <div
       className={classNames(container)}
       ref={canvasRef}
-      onMouseDown={(e) => e.button === 0 && !isStitching.current}
-      onMouseUp={() => !isStitching.current && finishAdjustShape(false)}
-      onClick={(e) => isStitching.current}
-      onMouseMove={(e) => isDrawing.current && onAdjustShape(e)}
-      onDoubleClick={() => isStitching.current && finishAdjustShape(false)}
-      onKeyDown={(e) => e.key === "Escape" && finishAdjustShape(true)}
+      onMouseMove={drawingDrawable}
+      onMouseDown={startDrawDrawable}
+      onMouseUp={finishDrawingDrawable}
+      onKeyDown={(e) => e.key === "Escape" && initializeDrawable()}
       tabIndex="0"
     >
       <Stage
@@ -206,64 +303,9 @@ const Canvas = () => {
         height={canvasContainer.height}
       >
         <Layer>
-          {shapes &&
-            shapes.map((shape, index) => {
-              if (shape?.type === toolEnum.ellipse) {
-                return (
-                  <Ellipse
-                    fill={shape.fillColor}
-                    x={shape.x}
-                    y={shape.y}
-                    width={shape.width}
-                    height={shape.height}
-                    key={`${shape.type}-${index}`}
-                  ></Ellipse>
-                );
-              }
-              if (shape?.type === toolEnum.rect) {
-                return (
-                  <Rect
-                    fill={shape.fillColor}
-                    x={shape.x}
-                    y={shape.y}
-                    width={shape.width}
-                    height={shape.height}
-                    key={`${shape.type}-${index}`}
-                  ></Rect>
-                );
-              }
-              if (shape?.type === toolEnum.polygon) {
-                return (
-                  <Line
-                    fill={shape.fillColor}
-                    points={shape.points}
-                    closed={true}
-                    key={`${shape.type}-${index}`}
-                  ></Line>
-                );
-              }
-            })}
-          {shapeType === toolEnum.ellipse && (
-            <Ellipse
-              fill={fillColor}
-              x={shape.x}
-              y={shape.y}
-              width={shape.width}
-              height={shape.height}
-            ></Ellipse>
-          )}
-          {shapeType === toolEnum.rect && (
-            <Rect
-              fill={fillColor}
-              x={shape.x}
-              y={shape.y}
-              width={shape.width}
-              height={shape.height}
-            ></Rect>
-          )}
-          {shapeType === toolEnum.polygon && (
-            <Line fill={fillColor} points={shapePoints} closed={true}></Line>
-          )}
+          <Drawables />
+
+          <DrawingDrawable />
         </Layer>
       </Stage>
     </div>

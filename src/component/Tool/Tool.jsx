@@ -12,7 +12,7 @@ import { toolEnum } from "const";
 
 const {
   container,
-  shapeButtonBox,
+  drawableButtonBox,
   customInputBox,
   controlButtonBox,
   guideBox,
@@ -23,8 +23,8 @@ const TOOL_TYPES = Object.values(toolEnum);
 const Tool = () => {
   const dispatch = useDispatch();
   const {
-    shapes,
-    shapeType,
+    drawables,
+    drawableType,
     fillColor,
     layersHistory,
     layersNow,
@@ -40,8 +40,8 @@ const Tool = () => {
     -1
   );
 
-  const setShapeButton = (type) => {
-    dispatch(canvas.actions.seShapeType(type));
+  const setDrawableButton = (type) => {
+    dispatch(canvas.actions.sedrawableType(type));
   };
 
   const onChangeColor = (e, target) => {
@@ -59,7 +59,9 @@ const Tool = () => {
     setStoredLayersNow(prevIndex);
     dispatch(canvas.actions.setLayersNow(prevIndex));
     dispatch(
-      canvas.actions.setShapes(prevIndex > -1 ? layersHistory[prevIndex] : [])
+      canvas.actions.setDrawables(
+        prevIndex > -1 ? layersHistory[prevIndex] : []
+      )
     );
   };
 
@@ -72,17 +74,19 @@ const Tool = () => {
     setStoredLayersNow(nextIndex);
     dispatch(canvas.actions.setLayersNow(nextIndex));
     dispatch(
-      canvas.actions.setShapes(nextIndex > -1 ? layersHistory[nextIndex] : [])
+      canvas.actions.setDrawables(
+        nextIndex > -1 ? layersHistory[nextIndex] : []
+      )
     );
   };
 
-  const clearShapes = () => {
+  const clearDrawables = () => {
     const newLayersHistory = layersHistory.filter(
       (_, index) => index <= layersNow
     );
     newLayersHistory.push([]);
 
-    dispatch(canvas.actions.setShapes([]));
+    dispatch(canvas.actions.setDrawables([]));
     dispatch(canvas.actions.setLayersHitory(newLayersHistory));
     setStoredLayersHistory(newLayersHistory);
 
@@ -96,7 +100,7 @@ const Tool = () => {
 
   const resetLayers = () => {
     if (window.confirm("초기화 하시겠습니까?")) {
-      dispatch(canvas.actions.setShapes([]));
+      dispatch(canvas.actions.setDrawables([]));
       dispatch(canvas.actions.setLayersHitory([]));
       setStoredLayersHistory([]);
       dispatch(canvas.actions.setLayersNow(-1));
@@ -116,13 +120,13 @@ const Tool = () => {
   return (
     <div className={classNames(container)}>
       <Button onClick={throwError}>에러발생</Button>
-      <div className={classNames(shapeButtonBox)}>
+      <div className={classNames(drawableButtonBox)}>
         <h3>드로잉 타입</h3>
         <div>
           {TOOL_TYPES.map((tooTypeValue) => (
             <Button
-              onClick={() => setShapeButton(tooTypeValue)}
-              isActive={shapeType === tooTypeValue}
+              onClick={() => setDrawableButton(tooTypeValue)}
+              isActive={drawableType === tooTypeValue}
               key={`TOOL_TYPE_${tooTypeValue}`}
             >
               {tooTypeValue}
@@ -157,9 +161,9 @@ const Tool = () => {
             redo
           </Button>
           <Button
-            onClick={() => shapes.length && clearShapes()}
+            onClick={() => drawables.length && clearDrawables()}
             isActive={false}
-            isDisable={!shapes.length}
+            isDisable={!drawables.length}
           >
             clear
           </Button>

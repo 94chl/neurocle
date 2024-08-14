@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 import styles from "./App.module.scss";
-import { Canvas, Tool } from "@/component";
+import { Canvas, Tool } from "./component";
 
 const { container } = styles;
 

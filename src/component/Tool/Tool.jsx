@@ -3,11 +3,12 @@
 import React from "react";
 import classNames from "classnames";
 import styles from "./Tool.module.scss";
-import { Button, CustomInput } from "@/component";
+import { Button, CustomInput } from "../../component";
 import { useDispatch, useSelector } from "react-redux";
-import { canvas } from "@/store/canvas/canvas";
-import { useLocalStorage } from "@/hook";
+import { canvas } from "../../store/canvas/canvas";
+import { useLocalStorage } from "../../hook";
 import * as Sentry from "@sentry/react";
+import { toolEnum } from "const";
 
 const {
   container,
@@ -16,6 +17,8 @@ const {
   controlButtonBox,
   guideBox,
 } = styles;
+
+const TOOL_TYPES = Object.values(toolEnum);
 
 const Tool = () => {
   const dispatch = useDispatch();
@@ -116,36 +119,15 @@ const Tool = () => {
       <div className={classNames(shapeButtonBox)}>
         <h3>드로잉 타입</h3>
         <div>
-          <Button
-            onClick={() => setShapeButton("line")}
-            isActive={shapeType === "line"}
-          >
-            직선
-          </Button>
-          <Button
-            onClick={() => setShapeButton("spline")}
-            isActive={shapeType === "spline"}
-          >
-            곡선
-          </Button>
-          <Button
-            onClick={() => setShapeButton("ellipse")}
-            isActive={shapeType === "ellipse"}
-          >
-            원
-          </Button>
-          <Button
-            onClick={() => setShapeButton("rect")}
-            isActive={shapeType === "rect"}
-          >
-            직사각형
-          </Button>
-          <Button
-            onClick={() => setShapeButton("polygon")}
-            isActive={shapeType === "polygon"}
-          >
-            다각형
-          </Button>
+          {TOOL_TYPES.map((tooTypeValue) => (
+            <Button
+              onClick={() => setShapeButton(tooTypeValue)}
+              isActive={shapeType === tooTypeValue}
+              key={`TOOL_TYPE_${tooTypeValue}`}
+            >
+              {tooTypeValue}
+            </Button>
+          ))}
         </div>
       </div>
       <div className={classNames(customInputBox)}>

@@ -1,4 +1,3 @@
-const CracoAlias = require("craco-alias");
 const { whenProd } = require("@craco/craco");
 const path = require("path");
 
@@ -16,13 +15,4 @@ module.exports = {
       }, webpackConfig);
     },
   },
-  plugins: [
-    {
-      plugin: CracoAlias,
-      options: {
-        source: "jsconfig",
-        jsConfigPath: "jsconfig.paths.json",
-      },
-    },
-  ],
 };

@@ -5,9 +5,9 @@ import classNames from "classnames";
 import styles from "./Canvas.module.scss";
 import { Stage, Layer, Rect, Ellipse, Line } from "react-konva";
 import { useDispatch, useSelector } from "react-redux";
-import { canvas } from "@/store/canvas/canvas";
-import { useLocalStorage } from "@/hook";
-import { shapeEnum } from "@/const";
+import { canvas } from "../../store/canvas/canvas";
+import { useLocalStorage } from "../../hook";
+import { toolEnum } from "../../const";
 
 const { container, stage } = styles;
 
@@ -17,6 +17,7 @@ const Canvas = () => {
     height: 0,
   });
   const canvasRef = useRef(null);
+  const stageRef = useRef(null);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -88,9 +89,7 @@ const Canvas = () => {
   const isStitching = useRef(false);
 
   useEffect(() => {
-    isStitching.current = [shapeEnum.polygon].includes(shapeType)
-      ? true
-      : false;
+    isStitching.current = [toolEnum.polygon].includes(shapeType) ? true : false;
   }, [shapeType]);
 
   const onAdjustShape = (e) => {
@@ -135,11 +134,23 @@ const Canvas = () => {
     isDrawing.current = !isDrawing.current;
   };
 
+  const selectShape = () => {
+    if (shapeType !== toolEnum.select) return;
+    if (stage?.ref) {
+      const pointerPosition = stage.getPointerPosition();
+      const element = stage.getIntersection(pointerPosition);
+
+      console.log("SELECT", element);
+    }
+  };
+
   const finishAdjustShape = (isReset) => {
     if (isReset && !isStitching.current) {
       initializeShape();
       return;
     }
+
+    selectShape();
 
     const newShapes = [...shapes];
     const newLayersHistory =
@@ -189,6 +200,7 @@ const Canvas = () => {
       tabIndex="0"
     >
       <Stage
+        ref={stageRef}
         className={classNames(stage)}
         width={canvasContainer.width}
         height={canvasContainer.height}
@@ -196,7 +208,7 @@ const Canvas = () => {
         <Layer>
           {shapes &&
             shapes.map((shape, index) => {
-              if (shape?.type === shapeEnum.ellipse) {
+              if (shape?.type === toolEnum.ellipse) {
                 return (
                   <Ellipse
                     fill={shape.fillColor}
@@ -208,7 +220,7 @@ const Canvas = () => {
                   ></Ellipse>
                 );
               }
-              if (shape?.type === shapeEnum.rect) {
+              if (shape?.type === toolEnum.rect) {
                 return (
                   <Rect
                     fill={shape.fillColor}
@@ -220,7 +232,7 @@ const Canvas = () => {
                   ></Rect>
                 );
               }
-              if (shape?.type === shapeEnum.polygon) {
+              if (shape?.type === toolEnum.polygon) {
                 return (
                   <Line
                     fill={shape.fillColor}
@@ -231,7 +243,7 @@ const Canvas = () => {
                 );
               }
             })}
-          {shapeType === shapeEnum.ellipse && (
+          {shapeType === toolEnum.ellipse && (
             <Ellipse
               fill={fillColor}
               x={shape.x}
@@ -240,7 +252,7 @@ const Canvas = () => {
               height={shape.height}
             ></Ellipse>
           )}
-          {shapeType === shapeEnum.rect && (
+          {shapeType === toolEnum.rect && (
             <Rect
               fill={fillColor}
               x={shape.x}
@@ -249,7 +261,7 @@ const Canvas = () => {
               height={shape.height}
             ></Rect>
           )}
-          {shapeType === shapeEnum.polygon && (
+          {shapeType === toolEnum.polygon && (
             <Line fill={fillColor} points={shapePoints} closed={true}></Line>
           )}
         </Layer>

@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { shapeEnum } from "@/const";
+import { toolEnum } from "../../const";
 
 export const canvas = createSlice({
   name: "canvas",
   initialState: {
-    shapeType: shapeEnum.rect,
+    shapeType: toolEnum.rect,
     fillColor: "#000000",
     shapes: [],
     layersHistory: [],

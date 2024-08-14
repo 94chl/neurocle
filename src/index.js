@@ -1,10 +1,9 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
-import { store } from "@/store";
+import { store } from "./store";
 import * as Sentry from "@sentry/react";
 
 Sentry.init({
@@ -22,14 +21,21 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
 });
 
-ReactDOM.render(
-  <React.StrictMode>
+const rootEl = document.getElementById("root");
+const root = createRoot(rootEl);
+
+const render = () => {
+  // 동적으로 App component 가져오기
+  // react component tree에서 변경사항이 있을 때 이를 반영하기 위함
+  // eslint-disable-next-line global-require
+  const App = require("./App").default;
+  root.render(
     <Provider store={store}>
       <App />
     </Provider>
-  </React.StrictMode>,
-  document.getElementById("root")
-);
+  );
+};
+render();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
